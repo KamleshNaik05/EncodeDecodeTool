@@ -1,530 +1,252 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Encode & Decode Tool</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', 'Poppins', sans-serif;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AES Secure Messenger</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        /* Animated background elements */
-        .bg-shapes {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: -1;
-        }
-
-        .shape {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .shape:nth-child(1) {
-            width: 80px;
-            height: 80px;
-            top: 10%;
-            left: 10%;
-            animation: float 15s infinite linear;
-        }
-
-        .shape:nth-child(2) {
-            width: 120px;
-            height: 120px;
-            top: 70%;
-            right: 15%;
-            animation: float 20s infinite linear reverse;
-        }
-
-        .shape:nth-child(3) {
-            width: 60px;
-            height: 60px;
-            bottom: 20%;
-            left: 20%;
-            animation: float 12s infinite linear;
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0) rotate(0deg);
-            }
-            50% {
-                transform: translateY(-20px) rotate(180deg);
-            }
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            width: 100%;
-            max-width: 500px;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
-            animation: fadeInUp 0.8s ease-out;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 25px;
-        }
-
-        .header i {
-            font-size: 28px;
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-right: 15px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-            font-weight: 700;
-            font-size: 28px;
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 25px;
-            font-size: 14px;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-            animation: slideIn 0.5s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .input-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        label {
-            font-weight: 600;
-            color: #444;
-            font-size: 15px;
-        }
-
-        .char-count {
-            font-size: 13px;
-            color: #888;
-        }
-
-        textarea {
-            width: 100%;
-            min-height: 120px;
-            padding: 15px;
-            font-size: 15px;
-            border-radius: 12px;
-            border: 2px solid #e0e0e0;
-            resize: vertical;
-            outline: none;
-            transition: all 0.3s;
-            background: #f9f9f9;
-            line-height: 1.5;
-        }
-
-        textarea:focus {
-            border-color: #6a11cb;
-            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
-            background: white;
-        }
-
-        .action-group {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .action-btn {
-            flex: 1;
-            padding: 14px;
-            font-size: 16px;
-            border: none;
-            border-radius: 12px;
-            background: #f0f0f0;
-            color: #555;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-weight: 600;
-        }
-
-        .action-btn.active {
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-            color: white;
-            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.3);
-        }
-
-        .action-btn:hover:not(.active) {
-            background: #e5e5e5;
-            transform: translateY(-2px);
-        }
-
-        .process-btn {
-            width: 100%;
-            padding: 16px;
-            font-size: 17px;
-            border: none;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 700;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.3);
-        }
-
-        .process-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(106, 17, 203, 0.4);
-        }
-
-        .process-btn:active {
-            transform: translateY(0);
-        }
-
-        .output-group {
-            margin-top: 10px;
-            animation: slideIn 0.5s ease-out 0.2s both;
-        }
-
-        .output-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .copy-btn {
-            background: #f0f0f0;
-            border: none;
-            border-radius: 8px;
-            padding: 6px 12px;
-            font-size: 13px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.3s;
-            color: #555;
-        }
-
-        .copy-btn:hover {
-            background: #6a11cb;
-            color: white;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            color: #777;
-            font-size: 13px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .footer i {
-            color: #6a11cb;
-        }
-
-        /* Tooltip */
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
-
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 140px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 8px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 12px;
-        }
-
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        /* Responsive design */
-        @media (max-width: 600px) {
-            .card {
-                padding: 25px 20px;
-                max-width: 100%;
-            }
-            
-            h1 {
-                font-size: 24px;
-            }
-            
-            .action-group {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            textarea {
-                min-height: 100px;
-            }
-            
-            .shape {
-                display: none;
-            }
-        }
-
-        @media (max-width: 400px) {
-            .card {
-                padding: 20px 15px;
-            }
-            
-            h1 {
-                font-size: 22px;
-            }
-            
-            .header {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .header i {
-                margin-right: 0;
-            }
-        }
-    </style>
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:'Segoe UI','Poppins',sans-serif;
+}
+body{
+    min-height:100vh;
+    background:linear-gradient(135deg,#6a11cb,#2575fc);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+.card{
+    background:rgba(255,255,255,0.95);
+    width:100%;
+    max-width:540px;
+    border-radius:20px;
+    padding:30px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.25);
+}
+.header{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:12px;
+    margin-bottom:20px;
+}
+.header i{font-size:26px;color:#6a11cb;}
+h1{
+    font-size:26px;
+    background:linear-gradient(135deg,#6a11cb,#2575fc);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+.subtitle{
+    text-align:center;
+    color:#666;
+    margin-bottom:20px;
+    font-size:14px;
+}
+label{font-weight:600;margin-bottom:6px;display:block;}
+input,textarea{
+    width:100%;
+    padding:14px;
+    border-radius:12px;
+    border:2px solid #e0e0e0;
+    font-size:15px;
+    outline:none;
+    margin-bottom:12px;
+}
+textarea{min-height:120px;resize:vertical;}
+button{
+    width:100%;
+    padding:14px;
+    font-size:16px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:700;
+}
+.action-btn{
+    background:linear-gradient(135deg,#6a11cb,#2575fc);
+    color:white;
+    margin-bottom:12px;
+}
+.process-btn{
+    background:#333;
+    color:white;
+    margin-bottom:15px;
+}
+.copy-btn{
+    width:auto;
+    padding:6px 12px;
+    font-size:13px;
+    background:#f0f0f0;
+}
+.footer{
+    text-align:center;
+    margin-top:15px;
+    font-size:13px;
+    color:#777;
+}
+</style>
 </head>
 
 <body>
-    <!-- Animated background shapes -->
-    <div class="bg-shapes">
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
+
+<div class="card">
+    <div class="header">
+        <i class="fas fa-lock"></i>
+        <h1>AES Secure Messenger</h1>
     </div>
 
-    <div class="card">
-        <div class="header">
-            <i class="fas fa-lock"></i>
-            <h1>Secure Encode & Decode Tool</h1>
-        </div>
-        
-        <p class="subtitle">Easily encode text to Base64 or decode Base64 back to readable text</p>
-        
-        <div class="input-group">
-            <div class="input-header">
-                <label for="inputText">Input Text</label>
-                <span class="char-count" id="inputCount">0 characters</span>
-            </div>
-            <textarea id="inputText" placeholder="Enter your text here..."></textarea>
-        </div>
-        
-        <div class="action-group">
-            <button class="action-btn active" data-action="encode">
-                <i class="fas fa-lock"></i> Encode
-            </button>
-            <button class="action-btn" data-action="decode">
-                <i class="fas fa-unlock"></i> Decode
-            </button>
-        </div>
-        
-        <button class="process-btn" id="processBtn">
-            <i class="fas fa-cogs"></i> Process Text
+    <p class="subtitle">AES Encryption • Hash • Tamper Detection • Expiry</p>
+
+    <label>Message</label>
+    <textarea id="message" placeholder="Enter your message..."></textarea>
+
+    <label>Secret Password</label>
+    <input type="password" id="password" placeholder="Shared secret password">
+
+    <label>Expiry Time (minutes)</label>
+    <input type="number" id="expiry" placeholder="Example: 5" min="1">
+
+    <button class="process-btn" id="processBtn">
+        <i class="fas fa-cogs"></i> Process
+    </button>
+
+    <label>Result</label>
+    <textarea id="result" readonly placeholder="Encrypted / Decrypted result"></textarea>
+
+    <div style="text-align:right;">
+        <button class="copy-btn" id="copyBtn">
+            <i class="fas fa-copy"></i> Copy
         </button>
-        
-        <div class="output-group">
-            <div class="output-header">
-                <label for="outputText">Output</label>
-                <button class="copy-btn tooltip" id="copyBtn">
-                    <i class="fas fa-copy"></i> Copy
-                    <span class="tooltiptext">Copy to clipboard</span>
-                </button>
-            </div>
-            <textarea id="outputText" placeholder="Your encoded/decoded result will appear here..." readonly></textarea>
-        </div>
-        
-        <div class="footer">
-            <i class="fas fa-shield-alt"></i>
-            <span>Base64 Encoding/Decoding Tool • Secure & Fast</span>
-        </div>
     </div>
 
-    <script>
-        // DOM elements
-        const inputText = document.getElementById('inputText');
-        const outputText = document.getElementById('outputText');
-        const inputCount = document.getElementById('inputCount');
-        const processBtn = document.getElementById('processBtn');
-        const copyBtn = document.getElementById('copyBtn');
-        const actionBtns = document.querySelectorAll('.action-btn');
-        
-        let currentAction = 'encode';
-        
-        // Update character count
-        inputText.addEventListener('input', () => {
-            const count = inputText.value.length;
-            inputCount.textContent = `${count} character${count !== 1 ? 's' : ''}`;
-        });
-        
-        // Set active action button
-        actionBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                actionBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentAction = btn.dataset.action;
-                
-                // Update button text based on action
-                const icon = currentAction === 'encode' ? 'fa-lock' : 'fa-unlock';
-                processBtn.innerHTML = `<i class="fas ${icon}"></i> ${currentAction === 'encode' ? 'Encode' : 'Decode'} Text`;
-            });
-        });
-        
-        // Process text (encode/decode)
-        function processText() {
-            const input = inputText.value.trim();
-            
-            if (!input) {
-                outputText.value = "⚠️ Please enter some text to process.";
+    <div class="footer">
+        Message auto-expires after specified time
+    </div>
+</div>
+
+<script>
+const msg = document.getElementById("message");
+const pwd = document.getElementById("password");
+const exp = document.getElementById("expiry");
+const res = document.getElementById("result");
+const processBtn = document.getElementById("processBtn");
+const copyBtn = document.getElementById("copyBtn");
+
+const enc = new TextEncoder();
+const dec = new TextDecoder();
+
+function bufToBase64(buf){
+    return btoa(String.fromCharCode(...new Uint8Array(buf)));
+}
+function base64ToBuf(b64){
+    return Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+}
+
+async function sha256(text){
+    const hash = await crypto.subtle.digest("SHA-256", enc.encode(text));
+    return bufToBase64(hash);
+}
+
+async function deriveKey(password, salt){
+    const keyMaterial = await crypto.subtle.importKey(
+        "raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]
+    );
+    return crypto.subtle.deriveKey(
+        { name:"PBKDF2", salt, iterations:100000, hash:"SHA-256" },
+        keyMaterial,
+        { name:"AES-GCM", length:256 },
+        false,
+        ["encrypt","decrypt"]
+    );
+}
+
+async function encryptAES(payload, password){
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const key = await deriveKey(password, salt);
+    const cipher = await crypto.subtle.encrypt(
+        { name:"AES-GCM", iv },
+        key,
+        enc.encode(payload)
+    );
+    return {
+        salt: bufToBase64(salt),
+        iv: bufToBase64(iv),
+        data: bufToBase64(cipher)
+    };
+}
+
+async function decryptAES(payload, password){
+    const salt = base64ToBuf(payload.salt);
+    const iv = base64ToBuf(payload.iv);
+    const data = base64ToBuf(payload.data);
+    const key = await deriveKey(password, salt);
+    const plain = await crypto.subtle.decrypt(
+        { name:"AES-GCM", iv },
+        key,
+        data
+    );
+    return dec.decode(plain);
+}
+
+processBtn.onclick = async () => {
+    try{
+        if(msg.value.trim().startsWith("{")){
+            // DECODE
+            const payload = JSON.parse(msg.value);
+            const decrypted = await decryptAES(payload, pwd.value);
+            const obj = JSON.parse(decrypted);
+
+            if(Date.now() > obj.expiry){
+                res.value = "⏳ Message expired. Access denied.";
                 return;
             }
-            
-            try {
-                if (currentAction === 'encode') {
-                    // Encode to Base64
-                    outputText.value = btoa(input);
-                } else {
-                    // Decode from Base64
-                    outputText.value = atob(input);
-                }
-                
-                // Add success visual feedback
-                outputText.style.borderColor = "#4CAF50";
-                setTimeout(() => {
-                    outputText.style.borderColor = "#e0e0e0";
-                }, 1000);
-                
-            } catch (e) {
-                outputText.value = "❌ Invalid input for decoding! Please make sure you're entering valid Base64 text.";
-                outputText.style.borderColor = "#f44336";
-                setTimeout(() => {
-                    outputText.style.borderColor = "#e0e0e0";
-                }, 1000);
-            }
-        }
-        
-        // Copy to clipboard
-        function copyToClipboard() {
-            if (!outputText.value) return;
-            
-            navigator.clipboard.writeText(outputText.value)
-                .then(() => {
-                    // Visual feedback
-                    const originalText = copyBtn.innerHTML;
-                    copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                    copyBtn.style.background = "#4CAF50";
-                    copyBtn.style.color = "white";
-                    
-                    setTimeout(() => {
-                        copyBtn.innerHTML = originalText;
-                        copyBtn.style.background = "";
-                        copyBtn.style.color = "";
-                    }, 2000);
-                })
-                .catch(err => {
-                    console.error('Failed to copy: ', err);
-                });
-        }
-        
-        // Event listeners
-        processBtn.addEventListener('click', processText);
-        copyBtn.addEventListener('click', copyToClipboard);
-        
-        // Add Enter key support
-        inputText.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'Enter') {
-                processText();
-            }
-        });
-        
-        // Initialize with example text
-        window.addEventListener('DOMContentLoaded', () => {
-            inputText.value = "Hello, World!";
-            inputText.dispatchEvent(new Event('input'));
-        });
-    </script>
-</body>
 
+            const verifyHash = await sha256(obj.message);
+            if(verifyHash !== obj.hash){
+                res.value = "🚨 Tampering detected!";
+                return;
+            }
+
+            res.value = obj.message;
+        }else{
+            // ENCODE
+            const minutes = Number(exp.value);
+            if(!minutes || minutes <= 0){
+                res.value = "⚠️ Enter valid expiry time.";
+                return;
+            }
+
+            const expiryTime = Date.now() + minutes * 60000;
+            const hash = await sha256(msg.value);
+
+            const encrypted = await encryptAES(
+                JSON.stringify({
+                    message: msg.value,
+                    hash,
+                    expiry: expiryTime
+                }),
+                pwd.value
+            );
+
+            res.value = JSON.stringify(encrypted);
+        }
+    }catch{
+        res.value = "❌ Wrong password or corrupted data.";
+    }
+};
+
+copyBtn.onclick = () => {
+    if(res.value) navigator.clipboard.writeText(res.value);
+};
+</script>
+
+</body>
 </html>
